@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ user.username }} - Profile | Webdop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #fafafa;
+    }
+    .navbar {
+      background-color: white;
+      border-bottom: 1px solid #dbdbdb;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+    .profile-header {
+      text-align: center;
+      padding: 30px 0 10px;
+    }
+    .profile-pic {
+      width: 110px;
+      height: 110px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #ccc;
+      margin-bottom: 10px;
+    }
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 10px;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      padding: 20px 0;
+    }
+    .gallery img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg px-3">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold fs-3" href="/dashboard">webdop</a>
+      <div class="d-flex gap-3">
+        <a href="/dashboard" class="btn btn-link"><i class="bi bi-house fs-4"></i></a>
+        <a href="/upload" class="btn btn-link"><i class="bi bi-plus-square fs-4"></i></a>
+        <a href="/profile/{{ session.username }}" class="btn btn-link"><i class="bi bi-person-circle fs-4"></i></a>
+        <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Profile Header -->
+  <div class="container">
+    <div class="profile-header">
+      <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=random" class="profile-pic" alt="Profile picture">
+      <h4 class="fw-bold">{{ user.username }}</h4>
+      <small class="text-muted">Joined on {{ user.joined_at }}</small>
+
+      <div class="stats mt-3">
+        <div><strong>{{ posts|length }}</strong><br>Posts</div>
+        <div><strong>{{ user.email }}</strong><br>Email</div>
+      </div>
+    </div>
+
+    <!-- Gallery -->
+    <div class="gallery">
+      {% for post in posts %}
+        <img src="{{ url_for('static', filename='uploads/' + post.image) }}" alt="User post">
+      {% endfor %}
+    </div>
+  </div>
+
+</body>
+</html>

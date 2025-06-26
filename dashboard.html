@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | Webdop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #fafafa;
+    }
+    .navbar {
+      background-color: white;
+      border-bottom: 1px solid #dbdbdb;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+    .post-card {
+      background: white;
+      border: 1px solid #dbdbdb;
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+    .post-image {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+    .story-bar {
+      display: flex;
+      overflow-x: auto;
+      padding: 10px;
+      gap: 10px;
+    }
+    .story-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid #ff4081;
+      object-fit: cover;
+    }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      text-decoration: none;
+      color: #333;
+    }
+    .sidebar-link:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg px-3">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold fs-3" href="/dashboard">webdop</a>
+      <form class="d-flex me-auto ms-4" method="get" action="/search">
+        <input class="form-control" type="search" name="q" placeholder="Search #hashtags" aria-label="Search">
+      </form>
+      <div class="d-flex gap-3">
+        <a href="/dashboard" class="btn btn-link"><i class="bi bi-house fs-4"></i></a>
+        <a href="/upload" class="btn btn-link"><i class="bi bi-plus-square fs-4"></i></a>
+        <a href="/profile/{{ session.username }}" class="btn btn-link"><i class="bi bi-person-circle fs-4"></i></a>
+        <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container mt-4">
+    
+    <!-- Optional Story Bar -->
+    <div class="story-bar mb-4">
+      {% for user in top_users %}
+        <div class="text-center">
+          <img src="https://ui-avatars.com/api/?name={{ user }}&background=random" class="story-avatar">
+          <small class="d-block text-muted">{{ user }}</small>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Upload Form -->
+    <form action="/upload" method="post" enctype="multipart/form-data" class="mb-4">
+      <div class="input-group">
+        <input type="file" name="image" class="form-control" required>
+        <input type="text" name="caption" class="form-control" placeholder="Write a caption...">
+        <button class="btn btn-primary" type="submit">Post</button>
+      </div>
+    </form>
+
+    <!-- Posts -->
+    {% for post in posts %}
+    <div class="post-card p-3">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <a href="/user/{{ post.username }}" class="fw-bold text-dark text-decoration-none">{{ post.username }}</a>
+        <small class="text-muted">{{ post.created_at }}</small>
+      </div>
+      <img src="{{ url_for('static', filename='uploads/' + post.image) }}" class="post-image mb-2" alt="Post Image">
+
+      <div class="d-flex align-items-center mb-2">
+        <!-- AJAX Like -->
+        <form onsubmit="likePost({{ post.id }}); return false;" class="me-3">
+          <button type="submit" class="btn btn-link text-danger p-0" id="like-count-{{ post.id }}">
+            ❤️ {{ likes.get(post.id, 0) }}
+          </button>
+        </form>
+        <span>💬 {{ comments.get(post.id, []) | length }}</span>
+      </div>
+
+      <p class="mb-2"><strong>{{ post.username }}</strong> {{ post.caption }}</p>
+
+      <!-- AJAX Comment -->
+      <form onsubmit="commentPost({{ post.id }}); return false;" class="d-flex">
+        <input type="text" name="comment" class="form-control me-2" id="comment-input-{{ post.id }}" placeholder="Add a comment...">
+        <button type="submit" class="btn btn-outline-secondary btn-sm">Post</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Scripts -->
+  <script>
+  function likePost(postId) {
+    fetch(`/like/${postId}`, { method: 'POST' })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById(`like-count-${postId}`).innerHTML = `❤️ ${data.likes}`;
+      });
+  }
+
+  function commentPost(postId) {
+    const comment = document.getElementById(`comment-input-${postId}`).value;
+    fetch(`/comment/${postId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ comment })
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert("Comment added!");
+      document.getElementById(`comment-input-${postId}`).value = '';
+    });
+  }
+  </script>
+
+</body>
+</html>
