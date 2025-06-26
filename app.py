@@ -9,7 +9,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'webdop_secret_key'
-app.config['UPLOAD_FOLDER'] = 'webdop_flask_app/static/uploads'
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 # Ensure upload directory exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
