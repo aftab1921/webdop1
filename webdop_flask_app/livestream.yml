@@ -1,0 +1,9 @@
+dbs:
+  - path: /data/webdop.db
+    replicas:
+      - type: s3
+        bucket: webdop-backup
+        path: webdop-db-backup
+        endpoint: s3.us-east-005.backblazeb2.com # or omit this if using AWS
+        access-key-id: ${ACCESS_KEY_ID}
+        secret-access-key: ${SECRET_ACCESS_KEY}
